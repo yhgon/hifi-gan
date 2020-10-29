@@ -10,11 +10,9 @@ modified by hyungon ryu
 $git clone https://github.com/yhgon/hifi-gan.git
 ```
 
-    - modify argument for checkpoint and config files `inference.py`
-    
-    - add tic/toc for inference `inference.py`   
-    
-    - add warm up to measure accurate tic/toc `inference.py`
+ - modify argument for checkpoint and config files `inference.py`
+ - add tic/toc for inference `inference.py`   
+ - add warm up to measure accurate tic/toc `inference.py`
     
 
 
