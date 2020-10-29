@@ -78,19 +78,28 @@ def inference(a):
             toc_gen = time.time()          
         print("done")
         for i, filname in enumerate(filelist):
+            tic_loadwav = time.time()
             wav, sr = load_wav(os.path.join(a.input_wavs_dir, filname))
             wav = wav / MAX_WAV_VALUE
             wav = torch.FloatTensor(wav).to(device)
-            tic_gen = time.time()
-            x = get_mel(wav.unsqueeze(0))
+            toc_loadwav = time.time()
+            x = get_mel(wav.unsqueeze(0))            
+            toc_mel = time.time()
             y_g_hat = generator(x)
             audio = y_g_hat.squeeze()
             audio = audio * MAX_WAV_VALUE
             toc_gen = time.time()
-            dur_gen = toc_gen - tic_gen
+            
             audio = audio.cpu().numpy().astype('int16')
-            dur_wav = len(audio)
+            toc_wav_cpu = time.time()
+            dur_wav = len(audio)                   
             sec_wav = dur_wav / h.sampling_rate
+            
+            dur_loadwav = toc_loadwav - tic_loadwav
+            dur_mel     = toc_mel     - toc_loadwav
+            dur_gen     = toc_gen     - toc_mel
+            dur_wav_cpu = toc_wav_cpu - toc_gen
+            dur_all     = toc_wav_cpu - toc_mel
 
             output_file = os.path.join(a.output_dir, os.path.splitext(filname)[0] + '_generated.wav')
             write(output_file, h.sampling_rate, audio)
