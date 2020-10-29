@@ -68,7 +68,7 @@ def inference(a):
         mel_rand = torch.randn(1, 80, 620).cuda().half() 
 
         print("try onnx export")
-        torch.onnx.export(generator, mel_rand, h.onnx_filename, 
+        torch.onnx.export(generator, mel_rand, a.onnx_filename, 
             input_names=["mel"], 
             output_names=["wav"], 
             dynamic_axes={ "mel":  {0: "batch_size", 2: "mel_seq"},
