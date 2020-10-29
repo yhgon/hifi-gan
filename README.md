@@ -6,15 +6,17 @@ modified by hyungon ryu
 1. Python >= 3.6
 2. Clone this repository.
 
+```bash
+$git clone https://github.com/yhgon/hifi-gan.git
+```
+
     - modify argument for checkpoint and config files `inference.py`
     
     - add tic/toc for inference `inference.py`   
     
     - add warm up to measure accurate tic/toc `inference.py`
     
-```bash
-$git clone https://github.com/yhgon/hifi-gan.git
-```
+
 
 3. Install python requirements. Please refer [requirements.txt](requirements.txt)
 4. Download and extract the [LJ Speech dataset](https://keithito.com/LJ-Speech-Dataset/).
