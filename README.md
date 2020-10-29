@@ -7,8 +7,11 @@ modified by hyungon ryu
 2. Clone this repository.
 
     -- modify to configure checkpoint/config files `inference.py`
+    
     -- add tic/toc for inference `inference.py`   
+    
     -- add warm up to measure accurate tic/toc `inference.py`
+    
 ```bash
 $git clone https://github.com/yhgon/hifi-gan.git
 ```
