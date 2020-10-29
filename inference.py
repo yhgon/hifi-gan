@@ -62,16 +62,15 @@ def inference(a):
         ## warm up 
         print("warm up..." , end='')
         for i, filname in enumerate(filelist):
-            if i ==0 : 
-                wav, sr = load_wav(os.path.join(a.input_wavs_dir, filname))
-                wav = wav / MAX_WAV_VALUE
-                wav = torch.FloatTensor(wav).to(device)
+            wav, sr = load_wav(os.path.join(a.input_wavs_dir, filname))
+            wav = wav / MAX_WAV_VALUE
+            wav = torch.FloatTensor(wav).to(device)
 
-                x = get_mel(wav.unsqueeze(0))
-                y_g_hat = generator(x)
-                audio = y_g_hat.squeeze()
-                audio = audio * MAX_WAV_VALUE
-                toc_gen = time.time()          
+            x = get_mel(wav.unsqueeze(0))
+            y_g_hat = generator(x)
+            audio = y_g_hat.squeeze()
+            audio = audio * MAX_WAV_VALUE
+            toc_gen = time.time()          
         print("done")
         for i, filname in enumerate(filelist):
             tic_loadwav = time.time()
