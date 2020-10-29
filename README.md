@@ -5,7 +5,6 @@ modified by hyungon ryu
 ## Pre-requisites
 1. Python >= 3.6
 2. Clone this repository.
-  -- modified
     -- modify to configure checkpoint/config files `inference.py`
     -- add tic/toc for inference `inference.py`   
     -- add warm up to measure accurate tic/toc `inference.py`
