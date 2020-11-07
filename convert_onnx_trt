@@ -1,0 +1,188 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+
+## for tensorrt 7.0 
+import glob
+import os
+import argparse
+import json
+import torch
+from scipy.io.wavfile import write
+from env import AttrDict
+from meldataset import mel_spectrogram, MAX_WAV_VALUE, load_wav
+from models import Generator
+
+import time 
+
+h = None
+device = None
+
+
+def load_checkpoint(filepath, device):
+    assert os.path.isfile(filepath)
+    print("Loading '{}'".format(filepath))
+    checkpoint_dict = torch.load(filepath, map_location=device)
+    print("Complete.")
+    return checkpoint_dict
+
+
+def get_mel(x):
+    return mel_spectrogram(x, h.n_fft, h.num_mels, h.sampling_rate, h.hop_size, h.win_size, h.fmin, h.fmax)
+
+
+def scan_checkpoint(cp_dir, prefix):
+    pattern = os.path.join(cp_dir, prefix + '*')
+    cp_list = glob.glob(pattern)
+    if len(cp_list) == 0:
+        return ''
+    return sorted(cp_list)[-1]
+
+def build_engine(model_file, max_ws=1*80*620, fp16=False):
+    import tensorrt as trt
+    print("building engine")
+    TRT_LOGGER = trt.Logger(trt.Logger.WARNING)
+    builder = trt.Builder(TRT_LOGGER)
+    builder.fp16_mode = fp16
+    config = builder.create_builder_config()
+    config.max_workspace_size = max_ws
+    if fp16:
+        config.flags != 1 << int(trt.BuilderFlag.FP16)
+    
+    explicit_batch = 1 << (int) (trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+    network = builder.create_network(explicit_batch)
+    with trt.OnnxParser(network, TRT_LOGGER) as parser:
+        with open(model_file, 'rb') as model:
+            parsed = parser.parse(model.read())
+            print("network.num_layers", network.num_layers)
+            #last_layer = network.get_layer(network.num_layers - 1)
+            #network.mark_output(last_layer.get_output(0))
+            engine = builder.build_engine(network, config=config)
+            return engine
+
+def convert_onnx(a):
+    tic_start = time.time()
+
+    filelist = os.listdir(a.input_wavs_dir)
+    os.makedirs(a.output_dir, exist_ok=True)
+
+    toc_filelist = time.time()
+
+    generator = Generator(h).to(device).half()
+    toc_model = time.time() 
+
+
+    state_dict_g = load_checkpoint(a.checkpoint_file, device)
+    generator.load_state_dict(state_dict_g['generator'])
+    toc_checkpoint = time.time() 
+
+
+    generator.half() ############ half
+    generator.eval()
+    generator.remove_weight_norm()
+    toc_ready = time.time() 
+    
+
+    with torch.no_grad():
+        ## try onnx 
+        print("try onnx ")
+        mel_rand = torch.randn(1, 80, 620).cuda().half() 
+
+        print("try onnx export")
+        torch.onnx.export(generator, mel_rand, a.onnx_filename,
+            input_names=["mel"], 
+            output_names=["wav"], 
+            dynamic_axes={ "mel":  {0: "batch_size", 2: "mel_seq"},
+                           "wav":  {0: "batch_size", 1: "wav_seq"}})
+    print("onnx done")
+
+
+def convert_trt(a):
+    engine = build_engine(a.onnx_filename,max_ws=1*80*620, fp16=True  )
+    with open(a.trt_filename, 'wb') as f:
+        f.write(bytearray(engine.serialize()))
+    print("trt done")
+
+
+def inference_trt(a):
+####### TODO #############
+    import pycuda.driver as cuda
+    import pycuda.autoinit
+    from pycuda.compiler import SourceModule
+
+    TRT_LOGGER = trt.Logger(trt.Logger.WARNING)
+    runtime = trt.Runtime(TRT_LOGGER)
+    with open(a.trt_filename, 'rb') as f:
+        engine_bytes = f.read()
+        engine = runtime.deserialize_cuda_engine(engine_bytes)
+        context = engine.create_execution_context()    
+
+    # get sizes of input and output and allocate memory required for input data and for output data
+    for binding in engine:
+        if engine.binding_is_input(binding):  # we expect only one input
+            input_shape = engine.get_binding_shape(binding)
+            input_size = trt.volume(input_shape) * engine.max_batch_size * np.dtype(np.float32).itemsize  # in bytes
+            device_input = cuda.mem_alloc(input_size)
+        else:  # and one output
+            output_shape = engine.get_binding_shape(binding)
+            # create page-locked memory buffers (i.e. won't be swapped to disk)
+            host_output = cuda.pagelocked_empty(trt.volume(output_shape) * engine.max_batch_size, dtype=np.float32)
+            device_output = cuda.mem_alloc(host_output.nbytes)
+
+
+    ## load audio and copy 
+    mel_rand = torch.randn(1, 80, 620).cuda().half()  
+    # preprocess input data
+    host_input = np.array(mel_rand.numpy(), dtype=np.float32, order='C')
+    cuda.memcpy_htod_async(device_input, host_input, stream)
+
+    # copy to gpu 
+    tic_trt = time.time()
+    context.execute_async(bindings=[int(device_input), int(device_output)], stream_handle=stream.handle)
+    toc_trt = time.time()
+    dur_trt =toc_trt-tic_trt
+    cuda.memcpy_dtoh_async(host_output, device_output, stream)
+    stream.synchronize()
+
+    # copy to cpu 
+    output_data = torch.Tensor(host_output).reshape(engine.max_batch_size, -1)
+
+    print('it took {}sec'.format(dur_trt))
+####### TODO #############
+
+
+def main():
+    print('Initializing Inference Process..')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_wavs_dir', default='test_files')
+    parser.add_argument('--onnx_filename', default='./generator.onnx')
+    parser.add_argument('--trt_filename', default='./generator.trt')    
+    parser.add_argument('--output_dir', default='generated_files')
+    parser.add_argument('--checkpoint_file', required=True)
+    parser.add_argument('--config_file', required=True)    
+    a = parser.parse_args()
+
+    config_file = a.config_file
+    with open(config_file) as f:
+        data = f.read()
+
+    global h
+    json_config = json.loads(data)
+    h = AttrDict(json_config)
+    #print(h)
+
+    torch.manual_seed(h.seed)
+    global device
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(h.seed)
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
+
+    convert_onnx(a)
+    convert_trt(a)
+
+
+if __name__ == '__main__':
+    main()
+
