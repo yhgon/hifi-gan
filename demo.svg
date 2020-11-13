@@ -12,40 +12,31 @@
       .button:active { filter: url(#huerot50) }
       #about { font-size: 12px }
     </style>
-
     <filter id="ds">
       <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
       <feOffset dx="2" dy="2"/>
       <feComposite in="SourceGraphic" operator="over"/>
     </filter>
-
     <filter id="huerot80" x="0" y="0" width="1" height="1">
       <feColorMatrix type="hueRotate" values="80"/>
     </filter>
-
     <filter id="huerot50" x="0" y="0" width="1" height="1">
       <feColorMatrix type="hueRotate" values="50"/>
     </filter>
-
     <linearGradient id="stops">
       <stop style="stop-color:#4096EE;stop-opacity:1" offset="0"/>
       <stop style="stop-color:#4096EE;stop-opacity:0" offset="1"/>
     </linearGradient>
-
     <linearGradient x1="0" y1="0" x2="0" y2="-1.5" id="fill" xlink:href="#stops" spreadMethod="reflect"/>
     <linearGradient x1="0" y1="0" x2="0" y2="-1.5" id="stroke" xlink:href="#stops" spreadMethod="reflect" gradientTransform="scale(1 -1)"/>
-
     <script>
       function $(sel) { return document.querySelector(sel); }
     </script>
-
-<audio  id="Test_Audio"  controls> 
- <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001.wav">
- <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_fastPitch_hifiGAN_v1_LJ.wav"  type="audio/wav" > 
- <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_FastPitch_HifiGAN_V1_LJFT.wav" type="audio/wav" > 
- <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_FastPitch_HifiGAN_V2_LJFT.wav" type="audio/wav"> 
- <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_FastPitch_HifiGAN_V3_LJFT.wav" type="audio/wav">
-</audio>
+    <audio xmlns="http://www.w3.org/1999/xhtml">
+      <source src="media/bubbles.ogg" type="audio/ogg"/>
+      <source src="media/bubbles.mp3" type="audio/mpeg"/>
+      <source src="media/bubbles.wav" type="audio/x-wav"/>
+    </audio>
   </defs>
   
   <g class="button" transform="translate(600, 200)">
