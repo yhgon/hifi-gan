@@ -47,11 +47,11 @@ Generated wav files are saved in `out_v1` .<br>
 
 ## demo file 
 
-LJ001-0001 GT <audio preload='autio'> <source src='./out/LJ001-0001.wav'></audio>
-LJ001-0001 TTS FastPtich hifiGAN V1 LJSpeech Pretrained <audio preload='autio'><source src='./out/LJ001-0001_fastPitch_hifiGAN_v1_LJv'></audio>
-LJ001-0001 TTS FastPitch hifiGAN V2 LJSpeech Pretrained<audio preload='autio'><source src='./out/LJ001-0001_FastPitch_HifiGAN_V1_LJFT'></audio>
-LJ001-0001 TTS FastPitch hifiGAN V3 LJSpeech Pretrained<audio preload='autio'><source src='./out/LJ001-0001_FastPitch_HifiGAN_V2_LJFT'></audio>
-LJ001-0001 TTS FastPitch hifiGAN V3<audio preload='autio'><source src='./out/LJ001-0001_FastPitch_HifiGAN_V3_LJFT'></audio>
+LJ001-0001 GT <audio  controls> <source src='./out/LJ001-0001.wav'></audio>
+LJ001-0001 TTS FastPtich hifiGAN V1 LJSpeech Pretrained <audio controls><source src='./out/LJ001-0001_fastPitch_hifiGAN_v1_LJ.wav' type="audio/wav" ></audio>
+LJ001-0001 TTS FastPitch hifiGAN V2 LJSpeech Pretrained<audio controls><source src='./out/LJ001-0001_FastPitch_HifiGAN_V1_LJFT.wav'type="audio/wav" ></audio>
+LJ001-0001 TTS FastPitch hifiGAN V3 LJSpeech Pretrained<audio controls><source src='./out/LJ001-0001_FastPitch_HifiGAN_V2_LJFT.wav' type="audio/wav"></audio>
+LJ001-0001 TTS FastPitch hifiGAN V3<audio controls><source src='./out/LJ001-0001_FastPitch_HifiGAN_V3_LJFT.wav' type="audio/wav"></audio>
 
 
 
