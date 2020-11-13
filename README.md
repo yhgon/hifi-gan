@@ -43,7 +43,16 @@ Generated wav files are saved in `out_v1` .<br>
 
 
 ## Inference for end-to-end speech with FastPitch
-`TODO` 
+`done` 
+
+## demo file 
+<audio controls><source src='./out/LJ001-0001.wav'></audio>
+<audio controls><source src='./out/LJ001-0001_fastPitch_hifiGAN_v1_LJv'></audio>
+<audio controls><source src='./out/LJ001-0001_FastPitch_HifiGAN_V1_LJFT'></audio>
+<audio controls><source src='./out/LJ001-0001_FastPitch_HifiGAN_V2_LJFT'></audio>
+<audio controls><source src='./out/LJ001-0001_FastPitch_HifiGAN_V3_LJFT'></audio>
+
+
 
 ## preprocess 
 `TODO`
