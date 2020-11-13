@@ -48,9 +48,9 @@ Generated wav files are saved in `out_v1` .<br>
 ## demo file 
 
 
-<audio  controls> 
- <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001.wav'>
- <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_fastPitch_hifiGAN_v1_LJ.wav" type="audio/wav" > 
+<audio  id="Test_Audio"  controls> 
+ <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001.wav">
+ <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_fastPitch_hifiGAN_v1_LJ.wav"  type="audio/wav" > 
  <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_FastPitch_HifiGAN_V1_LJFT.wav" type="audio/wav" > 
  <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_FastPitch_HifiGAN_V2_LJFT.wav" type="audio/wav"> 
  <source src="https://github.com/yhgon/hifi-gan/raw/master/out/LJ001-0001_FastPitch_HifiGAN_V3_LJFT.wav" type="audio/wav">
